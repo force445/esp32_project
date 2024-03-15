@@ -1,4 +1,15 @@
 #include <Arduino.h>
+#include <WiFi.h>
+
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+
+#include "logistic.h"
+
+Eloquent::ML::Port::LogisticRegression classifier;
+
+const char* ssid = "AUTOMATION_IOT_1";
+const char* password = "admin12345";
 
 const int outputEnabled = 2;
 const int S0 = 5;
@@ -23,12 +34,13 @@ int greenValue;
 int blueValue;
 int Frequency;
 
+bool previousIsBlank = false;
+
 void setup() {
   pinMode(S2, OUTPUT); /*Define S2 Pin as a OUTPUT*/
   pinMode(S3, OUTPUT); /*Define S3 Pin as a OUTPUT*/
   pinMode(sensorOut, INPUT); /*Define Sensor Output Pin as a INPUT*/
   Serial.begin(9600); /*Set the baudrate to 115200*/
-  Serial.print("This is TCS3200 Calibration Code");
 }
 
 int getRed() {
@@ -65,12 +77,33 @@ void loop() {
   blueValue = map(Blue, B_Min,B_Max,255,0);   /*Map the Blue Color Value*/
   delay(200);
 
-  Serial.print("[");
-  Serial.print(redValue);   /*Print Red Color Value*/
-  Serial.print(",");
-  Serial.print(greenValue); /*Print Green Color Value*/
-  Serial.print(",");
-  Serial.print(blueValue);  /*Print Blue Color Value*/
-  Serial.println("]");
-  delay(1000); 
+  float x[] = {redValue, greenValue, blueValue};
+  int prediction = classifier.predict(x);
+  // Serial.println(prediction);
+  if (prediction == 10) { 
+  if (!previousIsBlank) {
+    Serial.println("Blank");
+    previousIsBlank = true;
+    }
+  } 
+  else {
+  Serial.print(prediction);
+  Serial.print(": ");
+
+  switch (prediction) {
+    case 0: Serial.println("Red"); break;
+    case 1: Serial.println("White"); break;
+    case 2: Serial.println("Yellow"); break;
+    case 3: Serial.println("Purple"); break;
+    case 4: Serial.println("Orange"); break;
+    case 5: Serial.println("Blue"); break;
+    case 6: Serial.println("Black"); break;
+    case 7: Serial.println("Metal"); break;
+    case 8: Serial.println("Brown"); break;
+    case 9: Serial.println("Pink"); break;
+  }
+
+  previousIsBlank = false;
+
+  }
 }
