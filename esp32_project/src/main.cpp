@@ -11,6 +11,7 @@ Eloquent::ML::Port::LogisticRegression classifier;
 const char* ssid = "AUTOMATION_IOT_1";
 const char* password = "admin12345";
 
+
 const int outputEnabled = 2;
 const int S0 = 5;
 const int S1 = 4;
@@ -29,12 +30,12 @@ int Red = 0;
 int Green = 0;
 int Blue = 0;
 
-int redValue;
-int greenValue;
-int blueValue;
-int Frequency;
+int redValue, greenValue, blueValue, Frequency;
 
-bool previousIsBlank = false;
+int r, w, y, p, o, b, bl, m, br, pk, u;
+
+int red_count, white_count, yellow_count, purple_count, orange_count, blue_count, black_count, metal_count, brown_count, pink_count, unknown_count;
+
 
 void setup() {
   pinMode(S2, OUTPUT); /*Define S2 Pin as a OUTPUT*/
@@ -67,43 +68,144 @@ int getBlue() {
 void loop() {
   Red = getRed();
   redValue = map(Red, R_Min,R_Max,255,0); /*Map the Red Color Value*/
-  delay(200);
+  // delay(200);
+  // Serial.println(Red);
 
   Green = getGreen();
   greenValue = map(Green, G_Min,G_Max,255,0); /*Map the Green Color Value*/
-  delay(200);
+  // // delay(200);
+  // Serial.println(Green);
 
   Blue = getBlue();
   blueValue = map(Blue, B_Min,B_Max,255,0);   /*Map the Blue Color Value*/
-  delay(200);
+  // delay(200);
 
   float x[] = {redValue, greenValue, blueValue};
   int prediction = classifier.predict(x);
+  
   // Serial.println(prediction);
-  if (prediction == 10) { 
-  if (!previousIsBlank) {
-    Serial.println("Blank");
-    previousIsBlank = true;
-    }
-  } 
-  else {
-  Serial.print(prediction);
-  Serial.print(": ");
 
-  switch (prediction) {
-    case 0: Serial.println("Red"); break;
-    case 1: Serial.println("White"); break;
-    case 2: Serial.println("Yellow"); break;
-    case 3: Serial.println("Purple"); break;
-    case 4: Serial.println("Orange"); break;
-    case 5: Serial.println("Blue"); break;
-    case 6: Serial.println("Black"); break;
-    case 7: Serial.println("Metal"); break;
-    case 8: Serial.println("Brown"); break;
-    case 9: Serial.println("Pink"); break;
-  }
+  // if(prediction==0){
+  //   Serial.println("Red");
+  //   r++;
+  //   Serial.println(r);
+  //   if (r == 28) {
+  //     red_count++;
+  //     Serial.println("Red Count: ");
+  //     Serial.println(red_count);
+  //   }
+  // }
+  // else if (prediction==1){
+  //   Serial.println("White");
+  //   w++;
+  //   Serial.println(w);
+  //   if (w == 28) {
+  //     white_count++;
+  //     Serial.println("White Count: ");
+  //     Serial.println(white_count);
+  //   }
+  // }
+  // else if (prediction==2){
+  //   Serial.println("Yellow");
+  //   y++;
+  //   Serial.println(y);
+  //   if (y == 28) {
+  //     yellow_count++;
+  //     Serial.println("Yellow Count: ");
+  //     Serial.println(yellow_count);
+  //   }
+  // }
+  // else if (prediction==3){
+  //   Serial.println("Purple");
+  //   p++;
+  //   Serial.println(p);
+  //   if (p == 28) {
+  //     purple_count++;
+  //     Serial.println("Purple Count: ");
+  //     Serial.println(purple_count);
+  //   }
+  // }
+  // else if (prediction==4){
+  //   Serial.println("Orange");
+  //   o++;
+  //   Serial.println(o);
+  //   if (o == 28) {
+  //     orange_count++;
+  //     Serial.println("Orange Count: ");
+  //     Serial.println(orange_count);
+  //   }
+  // }
+  // else if (prediction==5){
+  //   Serial.println("Blue");
+  //   b++;
+  //   Serial.println(b);
+  //   if (b == 28) {
+  //     blue_count++;
+  //     Serial.println("Blue Count: ");
+  //     Serial.println(blue_count);
+  //   }
+  // }
+  // else if (prediction==6){
+  //   Serial.println("Black");
+  //   bl++;
+  //   Serial.println(bl);
+  //   if (bl == 28) {
+  //     black_count++;
+  //     Serial.println("Black Count: ");
+  //     Serial.println(black_count);
+  //   }
+  // }
+  // else if (prediction==7){
+  //   Serial.println("Metal");
+  //   m++;
+  //   Serial.println(m);
+  //   if (m == 28) {
+  //     metal_count++;
+  //     Serial.println("Metal Count: ");
+  //     Serial.println(metal_count);
+  //   }
+  // }
+  // else if (prediction==8){
+  //   Serial.println("Brown");
+  //   br++;
+  //   Serial.println(br);
+  //   if (br == 28) {
+  //     brown_count++;
+  //     Serial.println("Brown Count: ");
+  //     Serial.println(brown_count);
+  //   }
+  // }
+  // else if (prediction==9){
+  //   Serial.println("Pink");
+  //   pk++;
+  //   Serial.println(pk);
+  //   if (pk == 28) {
+  //     pink_count++;
+  //     Serial.println("Pink Count: ");
+  //     Serial.println(pink_count);
+  //   }
+  // }
+  // else if (prediction==10){
+  //   Serial.println("Unknown");
+  //   r = 0;
+  //   w = 0;
+  //   y = 0;
+  //   p = 0;
+  //   o = 0;
+  //   b = 0;
+  //   bl = 0;
+  //   m = 0;
+  //   br = 0;
+  //   pk = 0;
 
-  previousIsBlank = false;
+  Serial.print("[");
+  Serial.print(redValue);   /*Print Red Color Value*/
+  Serial.print(",");
+  Serial.print(greenValue); /*Print Green Color Value*/
+  Serial.print(",");
+  Serial.print(blueValue);  /*Print Blue Color Value*/
+  Serial.println("],"); // Close the array and print a newline
+  delay(200);
 
-  }
+// }  
 }
