@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include <WiFi.h>
+// #include <WiFi.h>
 
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
+// #include <AsyncTCP.h>
+// #include <ESPAsyncWebServer.h>
 
 #include "logistic.h"
 
@@ -12,25 +12,25 @@ const char* ssid = "AUTOMATION_IOT_1";
 const char* password = "admin12345";
 
 
-const int outputEnabled = 2;
-const int S0 = 5;
-const int S1 = 4;
 const int S2 = 2;
 const int S3 = 14;
 const int sensorOut = 12;
 
-int R_Min = 3;
-int G_Min = 3;
-int B_Min = 3;
-int R_Max = 18;
-int G_Max = 17;
-int B_Max = 13;
+int R_Min = 13;
+int G_Min = 43;
+int B_Min = 43;
+int C_Min = 13;
+int R_Max = 194;
+int G_Max = 626;
+int B_Max = 625;
+int C_Max = 194;
 
 int Red = 0;
 int Green = 0;
 int Blue = 0;
+int Clear = 0;
 
-int redValue, greenValue, blueValue, Frequency;
+int redValue, greenValue, blueValue, clearValue, Frequency;
 
 int r, w, y, p, o, b, bl, m, br, pk, u;
 
@@ -65,6 +65,13 @@ int getBlue() {
   return Frequency;
 }
 
+int getClear(){
+  digitalWrite(S2,HIGH);
+  digitalWrite(S3,LOW);
+  Frequency = pulseIn(sensorOut, LOW); /*Get the Clear Color Frequency*/
+  return Frequency;
+}
+
 void loop() {
   Red = getRed();
   redValue = map(Red, R_Min,R_Max,255,0); /*Map the Red Color Value*/
@@ -80,132 +87,218 @@ void loop() {
   blueValue = map(Blue, B_Min,B_Max,255,0);   /*Map the Blue Color Value*/
   // delay(200);
 
-  float x[] = {redValue, greenValue, blueValue};
+  Clear = getClear();
+  clearValue = map(Clear, C_Min,C_Max,255,0); /*Map the Clear Color Value*/
+
+  float x[] = {redValue, greenValue, blueValue, clearValue};
   int prediction = classifier.predict(x);
   
   // Serial.println(prediction);
 
-  // if(prediction==0){
-  //   Serial.println("Red");
-  //   r++;
-  //   Serial.println(r);
-  //   if (r == 28) {
-  //     red_count++;
-  //     Serial.println("Red Count: ");
-  //     Serial.println(red_count);
-  //   }
-  // }
-  // else if (prediction==1){
-  //   Serial.println("White");
-  //   w++;
-  //   Serial.println(w);
-  //   if (w == 28) {
-  //     white_count++;
-  //     Serial.println("White Count: ");
-  //     Serial.println(white_count);
-  //   }
-  // }
-  // else if (prediction==2){
-  //   Serial.println("Yellow");
-  //   y++;
-  //   Serial.println(y);
-  //   if (y == 28) {
-  //     yellow_count++;
-  //     Serial.println("Yellow Count: ");
-  //     Serial.println(yellow_count);
-  //   }
-  // }
-  // else if (prediction==3){
-  //   Serial.println("Purple");
-  //   p++;
-  //   Serial.println(p);
-  //   if (p == 28) {
-  //     purple_count++;
-  //     Serial.println("Purple Count: ");
-  //     Serial.println(purple_count);
-  //   }
-  // }
+  if(prediction==0){
+    Serial.println("Red");
+    r++;
+
+    w = 0;
+    y = 0;
+    p = 0;
+    o = 0;
+    b = 0;
+    bl = 0;
+    m = 0;
+    br = 0;
+    pk = 0;
+
+    Serial.println(r);
+    if (r == 45) {
+      red_count++;
+      Serial.println("Red Count: ");
+      Serial.println(red_count);
+      prediction = 6;
+    }
+  }
+  else if (prediction==1){
+    // Serial.println("White");
+    w++;
+
+    r = 0;
+    y = 0;
+    p = 0;
+    o = 0;
+    b = 0;
+    bl = 0;
+    m = 0;
+    br = 0;
+    pk = 0;
+    
+    // Serial.println(w);
+    if (w == 33) {
+      white_count++;
+      Serial.println("White Count: ");
+      Serial.println(white_count);
+      prediction = 6;
+    }
+  }
+  else if (prediction==2){
+    // Serial.println("Yellow");
+    y++;
+
+    w = 0;
+    r = 0;
+    p = 0;
+    o = 0;
+    b = 0;
+    bl = 0;
+    m = 0;
+    br = 0;
+    pk = 0;
+    
+    // Serial.println(y);
+    if (y == 28) {
+      yellow_count++;
+      Serial.println("Yellow Count: ");
+      Serial.println(yellow_count);
+      prediction = 6;
+    }
+  }
+  else if (prediction==3){
+    // Serial.println("Purple");
+    p++;
+
+    w = 0;
+    y = 0;
+    r = 0;
+    o = 0;
+    b = 0;
+    bl = 0;
+    m = 0;
+    br = 0;
+    pk = 0;
+    
+    // Serial.println(p);
+    if (p == 9) {
+      purple_count++;
+      Serial.println("Purple Count: ");
+      Serial.println(purple_count);
+      prediction = 6;
+    }
+  }
   // else if (prediction==4){
-  //   Serial.println("Orange");
-  //   o++;
-  //   Serial.println(o);
-  //   if (o == 28) {
-  //     orange_count++;
-  //     Serial.println("Orange Count: ");
-  //     Serial.println(orange_count);
-  //   }
-  // }
-  // else if (prediction==5){
   //   Serial.println("Blue");
   //   b++;
-  //   Serial.println(b);
-  //   if (b == 28) {
-  //     blue_count++;
-  //     Serial.println("Blue Count: ");
-  //     Serial.println(blue_count);
-  //   }
-  // }
-  // else if (prediction==6){
-  //   Serial.println("Black");
-  //   bl++;
-  //   Serial.println(bl);
-  //   if (bl == 28) {
-  //     black_count++;
-  //     Serial.println("Black Count: ");
-  //     Serial.println(black_count);
-  //   }
-  // }
-  // else if (prediction==7){
-  //   Serial.println("Metal");
-  //   m++;
-  //   Serial.println(m);
-  //   if (m == 28) {
-  //     metal_count++;
-  //     Serial.println("Metal Count: ");
-  //     Serial.println(metal_count);
-  //   }
-  // }
-  // else if (prediction==8){
-  //   Serial.println("Brown");
-  //   br++;
-  //   Serial.println(br);
-  //   if (br == 28) {
-  //     brown_count++;
-  //     Serial.println("Brown Count: ");
-  //     Serial.println(brown_count);
-  //   }
-  // }
-  // else if (prediction==9){
-  //   Serial.println("Pink");
-  //   pk++;
-  //   Serial.println(pk);
-  //   if (pk == 28) {
-  //     pink_count++;
-  //     Serial.println("Pink Count: ");
-  //     Serial.println(pink_count);
-  //   }
-  // }
-  // else if (prediction==10){
-  //   Serial.println("Unknown");
-  //   r = 0;
+
   //   w = 0;
   //   y = 0;
   //   p = 0;
   //   o = 0;
-  //   b = 0;
+  //   r = 0;
   //   bl = 0;
   //   m = 0;
   //   br = 0;
   //   pk = 0;
 
-  Serial.print("[");
-  Serial.print(redValue);   /*Print Red Color Value*/
-  Serial.print(",");
-  Serial.print(greenValue); /*Print Green Color Value*/
-  Serial.print(",");
-  Serial.print(blueValue);  /*Print Blue Color Value*/
-  Serial.println("],"); // Close the array and print a newline
-  delay(200);
+  //   Serial.println(b);
+  //   if (b == 2) {
+  //     blue_count++;
+  //     Serial.println("Blue Count: ");
+  //     Serial.println(blue_count);
+  //     prediction = 7;
+  //   }
+  // }
 
-// }  
+  // else if (prediction==6){
+  //   Serial.println("Black");
+  //   bl++;
+
+  //   w = 0;
+  //   y = 0;
+  //   p = 0;
+  //   o = 0;
+  //   b = 0;
+  //   r = 0;
+  //   m = 0;
+  //   br = 0;
+  //   pk = 0;
+
+  //   Serial.println(bl);
+  //   if (bl == 4) {
+  //     black_count++;
+  //     Serial.println("Black Count: ");
+  //     Serial.println(black_count);
+  //     prediction = 10;
+  //   }
+  //   }
+
+  else if (prediction==4){
+    // Serial.println("Brown");
+    br++;
+
+    w = 0;
+    y = 0;
+    p = 0;
+    o = 0;
+    b = 0;
+    bl = 0;
+    m = 0;
+    r = 0;
+    pk = 0;
+
+    // Serial.println(br);
+    if (br == 17) {
+      brown_count++;
+      Serial.println("Brown Count: ");
+      Serial.println(brown_count);
+    }
+  }
+
+  else if (prediction==5){
+    r = 0;
+    w = 0;
+    // Serial.print(w);
+    y = 0;
+    p = 0;
+    // Serial.print("purple:");
+    // Serial.print(p);
+    o = 0;
+    // Serial.print("orange:");
+    // Serial.print(o);
+    b = 0;
+    bl = 0;
+    m = 0;
+    br = 0;
+    pk = 0;
+
+  }  
+
+  // Serial.print("[");
+  // Serial.print(redValue);   /*Print Red Color Value*/
+  // Serial.print(",");
+  // Serial.print(greenValue); /*Print Green Color Value*/
+  // Serial.print(",");
+  // Serial.print(blueValue);  /*Print Blue Color Value*/
+  // Serial.print(",");
+  // Serial.print(clearValue); /*Print Clear Color Value*/
+  // Serial.println("],"); // Close the array and print a newline
+  // delay(200);
+
+  // switch (prediction) {
+  //   case 0:
+  //     Serial.println("Red");
+  //     break;
+  //   case 1:
+  //     Serial.println("White");
+  //     break;
+  //   case 2:
+  //     Serial.println("Yellow");
+  //     break;
+  //   case 3:
+  //     Serial.println("Purple");
+  //     break;
+  //   case 5:
+  //     Serial.println("Brown");
+  //     break;
+  //   default:
+  //     Serial.println("Unknown");
+  //     break;
+  // }
 }
